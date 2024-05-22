@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 2159.554, g: 2263.344, b: 3286.3755, a: 1}
+  m_IndirectSpecularColor: {r: 2160.5247, g: 2264.5706, b: 3287.5864, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -525,6 +525,7 @@ GameObject:
   - component: {fileID: 348195360}
   - component: {fileID: 348195362}
   - component: {fileID: 348195361}
+  - component: {fileID: 348195363}
   m_Layer: 0
   m_Name: Terminal Background
   m_TagString: Untagged
@@ -587,6 +588,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 348195359}
   m_CullTransparentMesh: 1
+--- !u!114 &348195363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 348195359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShowMaskGraphic: 1
 --- !u!1 &432432459
 GameObject:
   m_ObjectHideFlags: 0
@@ -1706,6 +1720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ScreenOutput: {fileID: 2079884164}
   CursorFlashDelay: 0.5
+  AcceptingInput: 0
 --- !u!1 &2013410473
 GameObject:
   m_ObjectHideFlags: 1
@@ -1811,7 +1826,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: hello world!
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: aa19bf8561f66de489d4638dbe37bb19, type: 2}
   m_sharedMaterial: {fileID: -656321588101668583, guid: aa19bf8561f66de489d4638dbe37bb19,
@@ -1847,7 +1862,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 1024
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
