@@ -42,6 +42,7 @@ namespace Terminal
         private float _cursorTimer = 0.0f;
         private bool _cursorEnabled = false;
         private int _cursorPosition;
+        private int _terminalUnmutablePoint = 0;
 
         private void Start()
         {
@@ -83,7 +84,7 @@ namespace Terminal
                 /* If left or right arrows are used, move the cursor */
                 if (Input.GetKeyDown(KeyCode.LeftArrow))
                 {
-                    _cursorPosition = Mathf.Max(0, _cursorPosition - 1);
+                    _cursorPosition = Mathf.Max(_terminalUnmutablePoint, _cursorPosition - 1);
                 }
                 if (Input.GetKeyDown(KeyCode.RightArrow))
                 {
@@ -99,11 +100,12 @@ namespace Terminal
                         if (letter is '\n' or '\r')
                         {
                             _terminalText = _terminalText.Insert(_cursorPosition, "\n");
+                            _terminalUnmutablePoint = _cursorPosition + 1;
                             _cursorPosition += 1;
                         }
                         else if (letter == '\b')
                         {
-                            if (_terminalText.Length > 0)
+                            if (_terminalText.Length - _terminalUnmutablePoint > 0)
                             {
                                 _terminalText = _terminalText.Remove(_cursorPosition-1, 1);
                                 _cursorPosition -= 1;
