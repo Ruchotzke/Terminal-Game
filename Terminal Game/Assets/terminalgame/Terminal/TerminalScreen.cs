@@ -44,13 +44,20 @@ namespace Terminal
         private int _cursorPosition;
         private int _terminalUnmutablePoint = 0;
 
+        private OS _os;
+        
+        private void Awake()
+        {
+            _os = new OS();
+        }
+
         private void Start()
         {
             _terminalText = ScreenOutput.text;
             _cursorPosition = _terminalText.Length;
             
             Print("Hello world.\n" +
-                  "Welcome to OS...Loading Modules...\n" +
+                  "Welcome to the OS...Loading Modules...\n" +
                   "$> ");
         }
 
@@ -99,9 +106,10 @@ namespace Terminal
                     {
                         if (letter is '\n' or '\r')
                         {
+                            _cursorPosition = _terminalText.Length;
                             _terminalText = _terminalText.Insert(_cursorPosition, "\n");
-                            _terminalUnmutablePoint = _cursorPosition + 1;
                             _cursorPosition += 1;
+                            OnEnterPressed();
                         }
                         else if (letter == '\b')
                         {
@@ -121,6 +129,13 @@ namespace Terminal
             }
         }
 
+        private void OnEnterPressed()
+        {
+            AcceptingInput = false;
+            string ret = _os.TakeCommand(_terminalText.Substring(_terminalUnmutablePoint-1, _cursorPosition - _terminalUnmutablePoint).Trim());
+            Print(ret);
+        }
+
         /// <summary>
         /// Print content to the screen.
         /// </summary>
@@ -137,9 +152,10 @@ namespace Terminal
             {
                 _terminalText += c;
                 _cursorPosition += 1;
-                yield return new WaitForSeconds(CharacterPrintDelay);
+                yield return new WaitForSeconds(_os.GetTimeForWorkUnits(1f));
             }
 
+            _terminalUnmutablePoint = _cursorPosition;
             AcceptingInput = true;
         }
 
