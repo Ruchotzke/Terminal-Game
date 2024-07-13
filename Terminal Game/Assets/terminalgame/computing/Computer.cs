@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using terminalgame.computing.os;
 using UnityEngine;
 
 namespace terminalgame.computing
@@ -10,19 +11,36 @@ namespace terminalgame.computing
     public class Computer
     {
         /// <summary>
-        /// The interfaces used to interact with this computer.
-        /// </summary>
-        public List<Interface> Interfaces;
-
-        /// <summary>
         /// The OS managing this computer.
         /// </summary>
         public OS OperatingSystem;
 
         /// <summary>
-        /// The hardware managment system for this computer.
+        /// The hardware management system for this computer.
         /// </summary>
-        public HWManager HwManager;
+        public HwManager HwManager;
+
+        /// <summary>
+        /// Start the computer.
+        /// </summary>
+        public void Boot()
+        {
+            /* Initialize hardware components */
+            OperatingSystem = HwManager.Initialize();
+            
+            /* Boot the OS if present, passing it a reference to the hardware to manage */
+            if (OperatingSystem != null)
+            {
+                /* Boot normally */
+                OperatingSystem.Boot(HwManager);
+            }
+            else
+            {
+                /* Hardware only */
+                //TODO: Implement BIOS/HW check
+            }
+            
+        }
     }
 }
 
