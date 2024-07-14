@@ -54,6 +54,7 @@ namespace terminalgame.computing
             }
             
             /* Tick the OS */
+            OperatingSystem.Tick(dt);
         }
     }
 }

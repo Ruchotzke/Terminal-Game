@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using terminalgame.computing.os.processing;
 namespace terminalgame.computing.os.display
 {
     /// <summary>
@@ -13,11 +13,22 @@ namespace terminalgame.computing.os.display
         public (int rows, int cols) Size = (21,80);
 
         public char[,] Screen;
+
+        private OS _os;
         
-        public DisplayDriver()
+        public DisplayDriver(OS parentOS)
         {
+            _os = parentOS;
+            
+            /* Initialize and clear without OS intervention */
             Screen = new char[Size.rows, Size.cols];
-            ClearScreen();
+            for (int r = 0; r < Size.rows; r++)
+            {
+                for (int c = 0; c < Size.cols; c++)
+                {
+                    Screen[r, c] = ' ';
+                }
+            }
         }
 
         /// <summary>
@@ -26,6 +37,12 @@ namespace terminalgame.computing.os.display
         /// <param name="cls">The character to clear the screen with.</param>
         public void ClearScreen(char cls = ' ')
         {
+            Process p = new Process();
+            p.WorkCallback = delegate
+            {
+                return false;
+            };
+            
             for (int r = 0; r < Size.rows; r++)
             {
                 for (int c = 0; c < Size.cols; c++)

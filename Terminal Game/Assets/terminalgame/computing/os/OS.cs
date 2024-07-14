@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using terminalgame.computing.os.display;
+using terminalgame.computing.os.processing;
 
 namespace terminalgame.computing.os
 {
@@ -22,6 +23,8 @@ namespace terminalgame.computing.os
         /// The hardware running underneath this OS.
         /// </summary>
         private HwManager _hardware;
+
+        private TaskManager _taskManager;
         
         /// <summary>
         /// Boot the operating system.
@@ -30,13 +33,14 @@ namespace terminalgame.computing.os
         public void Boot(HwManager resources)
         {
             _hardware = resources;
+            _taskManager = new TaskManager();
             
             /* Ensure the required hardware components are present */
             // TODO
             
             /* Generate a new display driver for each display */
             // TODO, support multiple
-            _primary = new DisplayDriver();
+            _primary = new DisplayDriver(this);
             foreach (var mon in _hardware.MonitorCatalog)
             {
                 mon.OsLink = _primary;
@@ -44,11 +48,43 @@ namespace terminalgame.computing.os
             
             /* Print some test material to the display */
             _primary.PrintLn("1");
-            _primary.PrintLn("12");
-            _primary.PrintLn("123");
-            _primary.PrintLn("1234");
-            _primary.SlideUpwards(30);
-            _primary.PrintLn("1234321");
+        }
+
+        private float timer = 1.0f;
+        private bool off = true;
+        
+        /// <summary>
+        /// Tick the time forward for the OS.
+        /// </summary>
+        /// <param name="dt"></param>
+        public void Tick(float dt)
+        {
+            timer -= dt;
+            if (timer <= 0.0f)
+            {
+                timer = .5f;
+
+                if (off)
+                {
+                    _primary.SlideUpwards();
+                }
+                else
+                {
+                    _primary.PrintLn("===========================================================================");
+                }
+                off = !off;
+            }
+        }
+
+        /// <summary>
+        /// Enqueue a given task on the OS.
+        /// Sorted based on task type.
+        /// </summary>
+        /// <param name="p">The process to enqueue.</param>
+        /// <returns>True if scheduled, otherwise false.</returns>
+        public bool EnqueueTask(Process p)
+        {
+            return true;
         }
     }
 }
