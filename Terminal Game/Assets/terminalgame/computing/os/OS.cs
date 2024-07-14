@@ -37,13 +37,18 @@ namespace terminalgame.computing.os
             /* Generate a new display driver for each display */
             // TODO, support multiple
             _primary = new DisplayDriver();
-            _hardware.GetDefaultDisplay().OSDriver = _primary;
+            foreach (var mon in _hardware.MonitorCatalog)
+            {
+                mon.OsLink = _primary;
+            }
             
             /* Print some test material to the display */
             _primary.PrintLn("1");
             _primary.PrintLn("12");
             _primary.PrintLn("123");
             _primary.PrintLn("1234");
+            _primary.SlideUpwards(30);
+            _primary.PrintLn("1234321");
         }
     }
 }

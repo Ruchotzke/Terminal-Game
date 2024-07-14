@@ -30,7 +30,8 @@ namespace terminalgame.computing.hardware.storage
 
         public override uint GetUsedStorageKBytes()
         {
-            throw new System.NotImplementedException();
+            //TODO: Update
+            return 0;
         }
 
         public override string Category()

@@ -34,6 +34,11 @@ namespace terminalgame.computing.hardware
             return ret;
         }
 
+        public void Tick(float delta)
+        {
+            return;
+        }
+
         /// <summary>
         /// Get the amount of storage possible with this storage medium in Kilobytes.
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using terminalgame.computing.hardware.display;
+using terminalgame.computing.os.display;
+using terminalgame.ingame;
 
 namespace terminalgame.computing.hardware
 {
@@ -8,8 +9,15 @@ namespace terminalgame.computing.hardware
     /// </summary>
     public class Monitor : IHwComponent
     {
+        /// <summary>
+        /// The driver link back to the OS.
+        /// </summary>
+        public DisplayDriver OsLink;
 
-        public Display DisplayManager;
+        /// <summary>
+        /// The link to the in-game display.
+        /// </summary>
+        public MonitorManager RealLink;
         
         public float MaxPowerDraw()
         {
@@ -37,6 +45,20 @@ namespace terminalgame.computing.hardware
             {
                 "Display:Text",
             };
+        }
+
+        public void Tick(float delta)
+        {
+            /* Grab the new screen from the driver */
+            List<string> screen = OsLink.GetScreen();
+            
+            /* Now update the text string on the monitor */
+            string text = "";
+            foreach (string s in screen)
+            {
+                text += s + "<br>";
+            }
+            RealLink.UpdateText(text);
         }
     }
 }

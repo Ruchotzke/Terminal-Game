@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using terminalgame.computing.hardware;
-using terminalgame.computing.hardware.display;
 using terminalgame.computing.os;
 
 namespace terminalgame.computing
@@ -75,14 +74,6 @@ namespace terminalgame.computing
             /* Return the OS first in the boot order, or null */
             if (BootList.Count != 0) return BootList[0].GetOS();
             return null;
-        }
-
-        /// <summary>
-        /// Return the default terminal for the OS to write to.
-        /// </summary>
-        public Display GetDefaultDisplay()
-        {
-            return MonitorCatalog.Count > 0 ? MonitorCatalog[0].DisplayManager : null;
         }
     }
 }

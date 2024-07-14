@@ -10,7 +10,7 @@ namespace terminalgame.computing.os.display
         /// <summary>
         /// The size of the terminal.
         /// </summary>
-        public (int rows, int cols) Size = (24,80);
+        public (int rows, int cols) Size = (21,80);
 
         public char[,] Screen;
         

@@ -36,5 +36,11 @@ namespace terminalgame.computing.hardware
         /// </summary>
         /// <returns>An array of capability strings.</returns>
         public List<string> Capabilities();
+
+        /// <summary>
+        /// Tick this components simulation forward a given amount of time.
+        /// </summary>
+        /// <param name="delta"></param>
+        public void Tick(float delta);
     }
 }

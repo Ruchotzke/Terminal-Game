@@ -39,7 +39,21 @@ namespace terminalgame.computing
                 /* Hardware only */
                 //TODO: Implement BIOS/HW check
             }
+        }
+
+        /// <summary>
+        /// Tick time forward for this computer.
+        /// </summary>
+        /// <param name="dt">The amount of time which passed since the last tick.</param>
+        public void Tick(float dt)
+        {
+            /* Tick each hardware component */
+            foreach (var hw in HwManager.HwComponents)
+            {
+                hw.Tick(dt);
+            }
             
+            /* Tick the OS */
         }
     }
 }
