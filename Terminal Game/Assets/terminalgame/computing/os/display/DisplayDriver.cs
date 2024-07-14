@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using terminalgame.computing.os.processing;
+using UnityEngine;
+using UnityEngine.UIElements;
+
 namespace terminalgame.computing.os.display
 {
     /// <summary>
@@ -13,6 +16,11 @@ namespace terminalgame.computing.os.display
         public (int rows, int cols) Size = (21,80);
 
         public char[,] Screen;
+
+        /// <summary>
+        /// A temporary holder for data during processing.
+        /// </summary>
+        private char[,] _backBuffer;
 
         private OS _os;
         
@@ -37,19 +45,20 @@ namespace terminalgame.computing.os.display
         /// <param name="cls">The character to clear the screen with.</param>
         public void ClearScreen(char cls = ' ')
         {
-            Process p = new Process();
-            p.WorkCallback = delegate
+            Process p = new Process(Size.rows * Size.cols / 100.0f);
+            p.OnUpdate = (current, needed, dwu) =>
             {
-                return false;
-            };
-            
-            for (int r = 0; r < Size.rows; r++)
-            {
-                for (int c = 0; c < Size.cols; c++)
+                float i = 0.0f;
+                for (int r = 0; r < Size.rows; r++)
                 {
-                    Screen[r, c] = cls;
+                    for (int c = 0; c < Size.cols && i < current; c++, i += 0.01f)
+                    {
+                        Screen[r, c] = cls;
+                    }
                 }
-            }
+            };
+
+            _os.EnqueueTask(p);
         }
 
         /// <summary>
@@ -60,26 +69,74 @@ namespace terminalgame.computing.os.display
         /// <param name="clearBot">True if the bottom needs to be cleared, false if left alone (more performant)</param>
         public void SlideUpwards(int rows = 1, char cls = ' ', bool clearBot = true)
         {
-            /* Slide upwards */
-            int i;
-            for (i = 0; i < Size.rows - rows; i++)
+            if (!clearBot)
             {
-                for (int c = 0; c < Size.cols; c++)
+                Process p = new Process((Size.rows - rows) * Size.cols * 0.01f);
+                p.OnStart = () =>
                 {
-                    Screen[i, c] = Screen[i + rows, c];
-                }
-            }
-            
-            /* Clear remaining rows if requested */
-            if (clearBot)
-            {
-                for (; i < Size.rows; i++)
-                {
-                    for (int c = 0; c < Size.cols; c++)
+                    _backBuffer = new char[Size.rows, Size.cols];
+                    for (int r = 0; r < Size.rows; r++)
                     {
-                        Screen[i, c] = cls;
+                        for (int c = 0; c < Size.cols; c++)
+                        {
+                            _backBuffer[r, c] = Screen[r, c];
+                        }
                     }
-                }
+                };
+                p.OnUpdate = (current, needed, dwu) =>
+                {
+                    /* Slide upwards */
+                    int i;
+                    float curr = 0.0f;
+                    for (i = 0; i < Size.rows - rows; i++)
+                    {
+                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.01f)
+                        {
+                            Screen[i, c] = _backBuffer[i + rows, c];
+                        }
+                    }
+                };
+
+                _os.EnqueueTask(p);
+            }
+            else
+            {
+                Process p = new Process(Size.rows * Size.cols * 0.01f);
+                p.OnStart = () =>
+                {
+                    _backBuffer = new char[Size.rows, Size.cols];
+                    for (int r = 0; r < Size.rows; r++)
+                    {
+                        for (int c = 0; c < Size.cols; c++)
+                        {
+                            _backBuffer[r, c] = Screen[r, c];
+                        }
+                    }
+                };
+                p.OnUpdate = (current, needed, dwu) =>
+                {
+                    /* Slide upwards */
+                    int i;
+                    float curr = 0.0f;
+                    for (i = 0; i < Size.rows - rows; i++)
+                    {
+                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.01f)
+                        {
+                            Screen[i, c] = _backBuffer[i + rows, c];
+                        }
+                    }
+
+                    /* Clear remaining rows if requested */
+                    for (; i < Size.rows; i++)
+                    {
+                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.01f)
+                        {
+                            Screen[i, c] = cls;
+                        }
+                    }
+                };
+
+                _os.EnqueueTask(p);
             }
         }
 
@@ -91,7 +148,12 @@ namespace terminalgame.computing.os.display
         /// <param name="ch"></param>
         public void SetChar(int row, int col, char ch)
         {
-            Screen[row, col] = ch;
+            Process p = new Process(.01f);
+            p.OnConclude = () =>
+            {
+                Screen[row, col] = ch;
+            };
+            _os.EnqueueTask(p);
         }
 
         /// <summary>
@@ -103,11 +165,17 @@ namespace terminalgame.computing.os.display
         /// <param name="str">The string to place. Will be clipped if off screen.</param>
         public void SetStr(int row, int col, string str)
         {
-            var arr = str.ToCharArray();
-            for (int c = col, i = 0; c < Size.cols && i < str.Length; c++, i++)
+            Process p = new Process(str.Length * 0.01f);
+            p.OnUpdate = (current, needed, dwu) =>
             {
-                Screen[row, c] = arr[i];
-            }
+                float curr = 0f;
+                for (int c = col, i = 0; c < Size.cols && i < str.Length && curr < current; c++, i++, curr += 0.01f)
+                {
+                    Screen[row, c] = str[i];
+                }
+            };
+
+            _os.EnqueueTask(p);
         }
 
         /// <summary>

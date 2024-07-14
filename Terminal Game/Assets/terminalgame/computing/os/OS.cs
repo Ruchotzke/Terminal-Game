@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using terminalgame.computing.os.display;
 using terminalgame.computing.os.processing;
+using UnityEngine;
 
 namespace terminalgame.computing.os
 {
@@ -47,11 +48,18 @@ namespace terminalgame.computing.os
             }
             
             /* Print some test material to the display */
-            _primary.PrintLn("1");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
         }
-
-        private float timer = 1.0f;
-        private bool off = true;
         
         /// <summary>
         /// Tick the time forward for the OS.
@@ -59,21 +67,8 @@ namespace terminalgame.computing.os
         /// <param name="dt"></param>
         public void Tick(float dt)
         {
-            timer -= dt;
-            if (timer <= 0.0f)
-            {
-                timer = .5f;
-
-                if (off)
-                {
-                    _primary.SlideUpwards();
-                }
-                else
-                {
-                    _primary.PrintLn("===========================================================================");
-                }
-                off = !off;
-            }
+            /* Update the processes */
+            _taskManager.OnTick(dt);
         }
 
         /// <summary>
@@ -84,6 +79,7 @@ namespace terminalgame.computing.os
         /// <returns>True if scheduled, otherwise false.</returns>
         public bool EnqueueTask(Process p)
         {
+            _taskManager.EnqueueTask(p);
             return true;
         }
     }

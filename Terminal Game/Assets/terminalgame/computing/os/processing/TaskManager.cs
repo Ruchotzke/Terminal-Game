@@ -22,7 +22,7 @@ namespace terminalgame.computing.os.processing
         /// Enqueue a new task for this OS to work through.
         /// </summary>
         /// <param name="process"></param>
-        public void EnqueueTask(Process process, int priority = 1)
+        public void EnqueueTask(Process process, int priority = 0)
         {
             if (!Tasks.Keys.Contains(priority))
             {
@@ -30,6 +30,26 @@ namespace terminalgame.computing.os.processing
             }
 
             Tasks[priority].Add(process);
+        }
+
+        public void OnTick(float dt)
+        {
+            /* TODO: Look into getting HW info and modulating speeds */
+            if (Tasks.Keys.Count > 0)
+            {
+                if (Tasks[0].Count > 0)
+                {
+                    if (Tasks[0][0].CurrentWork == 0.0f)
+                    {
+                        Tasks[0][0].OnStart();
+                    }
+                    bool done = Tasks[0][0].ApplyWork(1000 * dt);
+                    if (done)
+                    {
+                        Tasks[0].RemoveAt(0);
+                    }
+                }
+            }
         }
     }
 }
