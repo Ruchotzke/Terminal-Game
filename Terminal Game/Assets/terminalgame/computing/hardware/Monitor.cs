@@ -7,8 +7,14 @@ namespace terminalgame.computing.hardware
     /// <summary>
     /// Some sort of monitor for displaying text.
     /// </summary>
-    public class Monitor : IHwComponent
+    public class Monitor : HwComponent
     {
+        public Monitor()
+        {
+            _capabilities = new Dictionary<string, float>();
+            _capabilities.Add("Display:Text", 1);
+        }
+        
         /// <summary>
         /// The driver link back to the OS.
         /// </summary>
@@ -19,35 +25,27 @@ namespace terminalgame.computing.hardware
         /// </summary>
         public MonitorManager RealLink;
         
-        public float MaxPowerDraw()
+        public override float MaxPowerDraw()
         {
             return 0;
         }
 
-        public float PollJoulesUsed()
+        public override float PollJoulesUsed()
         {
             return 0;
         }
 
-        public string Category()
+        public override string Category()
         {
             return "Interfaces:Monitor";
         }
 
-        public string Name()
+        public override string Name()
         {
             return "Monitor";
         }
 
-        public List<string> Capabilities()
-        {
-            return new List<string>()
-            {
-                "Display:Text",
-            };
-        }
-
-        public void Tick(float delta)
+        public override void Tick(float delta)
         {
             /* Grab the new screen from the driver */
             List<string> screen = OsLink.GetScreen();

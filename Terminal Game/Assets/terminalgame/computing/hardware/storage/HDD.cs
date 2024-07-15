@@ -8,6 +8,15 @@ namespace terminalgame.computing.hardware.storage
     /// </summary>
     public class HDD : Storage
     {
+        /// <summary>
+        /// Construct a new hard drive.
+        /// </summary>
+        public HDD()
+        {
+            _capabilities = new Dictionary<string, float>();
+            _capabilities.Add("storage", 10.0f);
+        }
+        
         public override float MaxPowerDraw()
         {
             return -25;

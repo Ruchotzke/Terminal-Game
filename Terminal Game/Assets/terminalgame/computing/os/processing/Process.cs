@@ -1,4 +1,6 @@
-﻿namespace terminalgame.computing.os.processing
+﻿using System.Collections.Generic;
+
+namespace terminalgame.computing.os.processing
 {
     /// <summary>
     /// A single process running on an OS.
@@ -19,6 +21,11 @@
         /// How much work has been done so far.
         /// </summary>
         public float CurrentWork;
+
+        /// <summary>
+        /// The characterization of this process.
+        /// </summary>
+        public WorkloadCharacterization Characterization;
 
         public Process(float totalWork)
         {

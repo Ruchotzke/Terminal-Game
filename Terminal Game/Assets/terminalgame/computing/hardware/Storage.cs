@@ -6,7 +6,7 @@ namespace terminalgame.computing.hardware
     /// <summary>
     /// A general storage component.
     /// </summary>
-    public abstract class Storage: IHwComponent
+    public abstract class Storage: HwComponent
     {
 
         /// <summary>
@@ -14,27 +14,12 @@ namespace terminalgame.computing.hardware
         /// </summary>
         public OS BoundOS;
         
-        public abstract float MaxPowerDraw();
-
-        public abstract float PollJoulesUsed();
-
-        public virtual string Category()
+        public override string Category()
         {
             return "Storage";
         }
 
-        public abstract string Name();
-
-        public virtual List<string> Capabilities()
-        {
-            List<string> ret = new List<string>();
-            
-            ret.Add("persistent storage");
-
-            return ret;
-        }
-
-        public void Tick(float delta)
+        public override void Tick(float delta)
         {
             return;
         }

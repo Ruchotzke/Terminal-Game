@@ -13,7 +13,7 @@ namespace terminalgame.computing
         /// <summary>
         /// All components managed.
         /// </summary>
-        public List<IHwComponent> HwComponents;
+        public List<HwComponent> HwComponents;
 
         /// <summary>
         /// All storage hardware.
@@ -32,7 +32,7 @@ namespace terminalgame.computing
         /// </summary>
         public HwManager()
         {
-            HwComponents = new List<IHwComponent>();
+            HwComponents = new List<HwComponent>();
             
             /* Catalogs */
             StorageCatalog = new List<Storage>();
