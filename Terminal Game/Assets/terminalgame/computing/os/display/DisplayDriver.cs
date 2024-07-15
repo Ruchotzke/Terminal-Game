@@ -71,7 +71,7 @@ namespace terminalgame.computing.os.display
         {
             if (!clearBot)
             {
-                Process p = new Process((Size.rows - rows) * Size.cols * 0.01f);
+                Process p = new Process((Size.rows - rows) * Size.cols * 0.0001f);
                 p.OnStart = () =>
                 {
                     _backBuffer = new char[Size.rows, Size.cols];
@@ -90,7 +90,7 @@ namespace terminalgame.computing.os.display
                     float curr = 0.0f;
                     for (i = 0; i < Size.rows - rows; i++)
                     {
-                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.01f)
+                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.0001f)
                         {
                             Screen[i, c] = _backBuffer[i + rows, c];
                         }
@@ -101,7 +101,7 @@ namespace terminalgame.computing.os.display
             }
             else
             {
-                Process p = new Process(Size.rows * Size.cols * 0.01f);
+                Process p = new Process(Size.rows * Size.cols * 0.0001f);
                 p.OnStart = () =>
                 {
                     _backBuffer = new char[Size.rows, Size.cols];
@@ -120,7 +120,7 @@ namespace terminalgame.computing.os.display
                     float curr = 0.0f;
                     for (i = 0; i < Size.rows - rows; i++)
                     {
-                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.01f)
+                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.0001f)
                         {
                             Screen[i, c] = _backBuffer[i + rows, c];
                         }
@@ -129,7 +129,7 @@ namespace terminalgame.computing.os.display
                     /* Clear remaining rows if requested */
                     for (; i < Size.rows; i++)
                     {
-                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.01f)
+                        for (int c = 0; c < Size.cols && curr < current; c++, curr += 0.0001f)
                         {
                             Screen[i, c] = cls;
                         }

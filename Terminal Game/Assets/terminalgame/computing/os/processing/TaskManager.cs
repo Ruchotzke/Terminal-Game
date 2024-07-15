@@ -43,7 +43,7 @@ namespace terminalgame.computing.os.processing
                     {
                         Tasks[0][0].OnStart();
                     }
-                    bool done = Tasks[0][0].ApplyWork(1000 * dt);
+                    bool done = Tasks[0][0].ApplyWork(1f * dt);
                     if (done)
                     {
                         Tasks[0].RemoveAt(0);

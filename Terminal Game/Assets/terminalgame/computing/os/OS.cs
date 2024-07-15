@@ -49,6 +49,7 @@ namespace terminalgame.computing.os
             
             /* Print some test material to the display */
             _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.SlideUpwards();
             _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
             _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
             _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
