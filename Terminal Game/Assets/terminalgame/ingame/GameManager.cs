@@ -17,6 +17,7 @@ namespace terminalgame.ingame
             c.HwManager = new HwManager();
             HDD storage = new HDD();
             CPU cpu = new CPU();
+            Memory ram = new Memory(4000);
             storage.BindOS(new OS());
             c.HwManager.HwComponents.Add(storage);
             c.HwManager.HwComponents.Add(cpu);

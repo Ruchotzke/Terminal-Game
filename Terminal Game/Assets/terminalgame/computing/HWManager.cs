@@ -20,10 +20,21 @@ namespace terminalgame.computing
         /// </summary>
         public List<Storage> StorageCatalog;
 
+        /// <summary>
+        /// All monitors.
+        /// </summary>
         public List<Monitor> MonitorCatalog;
-
+        
+        /// <summary>
+        /// All CPUs.
+        /// </summary>
         public List<CPU> CPUCatalog;
 
+        /// <summary>
+        /// All memory.
+        /// </summary>
+        public List<Memory> MemoryCatalog;
+        
         /// <summary>
         /// All storage media containing bootable systems.
         /// </summary>
@@ -41,6 +52,7 @@ namespace terminalgame.computing
             BootList = new List<Storage>();
             MonitorCatalog = new List<Monitor>();
             CPUCatalog = new List<CPU>();
+            MemoryCatalog = new List<Memory>();
         }
         
         /// <summary>
@@ -73,6 +85,11 @@ namespace terminalgame.computing
                 {
                     /* This is a CPU */
                     CPUCatalog.Add((CPU)hw);
+                }
+                else if (category.StartsWith("Memory"))
+                {
+                    /* This is RAM */
+                    MemoryCatalog.Add((Memory)hw);
                 }
             }
             
