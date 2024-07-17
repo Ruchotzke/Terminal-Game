@@ -27,9 +27,10 @@ namespace terminalgame.computing.os.processing
         /// </summary>
         public WorkloadCharacterization Characterization;
 
-        public Process(float totalWork)
+        public Process(float totalWork, WorkloadCharacterization workloadCharacterization)
         {
             TotalWork = totalWork;
+            Characterization = workloadCharacterization;
             CurrentWork = 0;
         }
 

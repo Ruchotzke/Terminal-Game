@@ -65,5 +65,18 @@ namespace terminalgame.computing.os.processing
             
             return modifier;
         }
+
+        /// <summary>
+        /// Generate a characterization used for text rendering.
+        /// </summary>
+        /// <returns></returns>
+        public static WorkloadCharacterization TextRendering()
+        {
+            WorkloadCharacterization w = new WorkloadCharacterization(0.2f, 0.01f);
+            w.AdditionalNeeds.Add("computing", 1f);
+            w.AdditionalNeeds.Add("graphics", 2f);
+
+            return w;
+        }
     }
 }

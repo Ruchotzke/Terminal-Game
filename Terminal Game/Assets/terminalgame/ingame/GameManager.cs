@@ -1,4 +1,5 @@
 using terminalgame.computing;
+using terminalgame.computing.hardware;
 using terminalgame.computing.hardware.storage;
 using terminalgame.computing.os;
 using UnityEngine;
@@ -15,8 +16,10 @@ namespace terminalgame.ingame
             c = new Computer();
             c.HwManager = new HwManager();
             HDD storage = new HDD();
+            CPU cpu = new CPU();
             storage.BindOS(new OS());
             c.HwManager.HwComponents.Add(storage);
+            c.HwManager.HwComponents.Add(cpu);
         
             /* Find and bind all monitors */
             foreach (var m in FindObjectsOfType<MonitorManager>())

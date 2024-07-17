@@ -22,6 +22,8 @@ namespace terminalgame.computing
 
         public List<Monitor> MonitorCatalog;
 
+        public List<CPU> CPUCatalog;
+
         /// <summary>
         /// All storage media containing bootable systems.
         /// </summary>
@@ -38,6 +40,7 @@ namespace terminalgame.computing
             StorageCatalog = new List<Storage>();
             BootList = new List<Storage>();
             MonitorCatalog = new List<Monitor>();
+            CPUCatalog = new List<CPU>();
         }
         
         /// <summary>
@@ -65,6 +68,11 @@ namespace terminalgame.computing
                 {
                     /* This is a monitor */
                     MonitorCatalog.Add((Monitor)hw);
+                }
+                else if (category.StartsWith("Computing:CPU"))
+                {
+                    /* This is a CPU */
+                    CPUCatalog.Add((CPU)hw);
                 }
             }
             

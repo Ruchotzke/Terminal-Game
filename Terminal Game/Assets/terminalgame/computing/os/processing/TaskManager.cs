@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using terminalgame.computing.hardware;
 
 namespace terminalgame.computing.os.processing
 {
@@ -13,6 +14,11 @@ namespace terminalgame.computing.os.processing
         /// </summary>
         public Dictionary<int, List<Process>> Tasks;
 
+        /// <summary>
+        /// The counter used to increment the PID.
+        /// </summary>
+        private uint _pidctr = 1;
+        
         public TaskManager()
         {
             Tasks = new Dictionary<int, List<Process>>();
@@ -30,20 +36,31 @@ namespace terminalgame.computing.os.processing
             }
 
             Tasks[priority].Add(process);
+            process.PID = _pidctr++;
         }
 
-        public void OnTick(float dt)
+        public void OnTick(float dt, HwManager resources)
         {
-            /* TODO: Look into getting HW info and modulating speeds */
             if (Tasks.Keys.Count > 0)
             {
                 if (Tasks[0].Count > 0)
                 {
-                    if (Tasks[0][0].CurrentWork == 0.0f)
+                    /* Get a reference to the next task to tackle */
+                    Process curr = Tasks[0][0];
+                    
+                    /* If this task is just started, initialize it */
+                    if (curr.CurrentWork == 0.0f)
                     {
-                        Tasks[0][0].OnStart();
+                        curr.OnStart();
                     }
-                    bool done = Tasks[0][0].ApplyWork(1f * dt);
+                    
+                    /* Compute how much work should be applied */
+                    CPU hw = resources.CPUCatalog[0];
+                    float work = 1f;
+                    work *= curr.Characterization.GetCharacterizationModifier(hw.Capabilities());
+                    bool done = curr.ApplyWork(work * dt);
+                    
+                    /* If the task was completed, clean it up */
                     if (done)
                     {
                         Tasks[0].RemoveAt(0);

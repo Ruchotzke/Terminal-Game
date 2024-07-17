@@ -45,7 +45,7 @@ namespace terminalgame.computing.os.display
         /// <param name="cls">The character to clear the screen with.</param>
         public void ClearScreen(char cls = ' ')
         {
-            Process p = new Process(Size.rows * Size.cols / 100.0f);
+            Process p = new Process(Size.rows * Size.cols / 100.0f, WorkloadCharacterization.TextRendering());
             p.OnUpdate = (current, needed, dwu) =>
             {
                 float i = 0.0f;
@@ -71,7 +71,7 @@ namespace terminalgame.computing.os.display
         {
             if (!clearBot)
             {
-                Process p = new Process((Size.rows - rows) * Size.cols * 0.0001f);
+                Process p = new Process((Size.rows - rows) * Size.cols * 0.0001f, WorkloadCharacterization.TextRendering());
                 p.OnStart = () =>
                 {
                     _backBuffer = new char[Size.rows, Size.cols];
@@ -101,7 +101,7 @@ namespace terminalgame.computing.os.display
             }
             else
             {
-                Process p = new Process(Size.rows * Size.cols * 0.0001f);
+                Process p = new Process(Size.rows * Size.cols * 0.0001f, WorkloadCharacterization.TextRendering());
                 p.OnStart = () =>
                 {
                     _backBuffer = new char[Size.rows, Size.cols];
@@ -148,7 +148,7 @@ namespace terminalgame.computing.os.display
         /// <param name="ch"></param>
         public void SetChar(int row, int col, char ch)
         {
-            Process p = new Process(.01f);
+            Process p = new Process(.01f, WorkloadCharacterization.TextRendering());
             p.OnConclude = () =>
             {
                 Screen[row, col] = ch;
@@ -165,7 +165,7 @@ namespace terminalgame.computing.os.display
         /// <param name="str">The string to place. Will be clipped if off screen.</param>
         public void SetStr(int row, int col, string str)
         {
-            Process p = new Process(str.Length * 0.01f);
+            Process p = new Process(str.Length * 0.01f, WorkloadCharacterization.TextRendering());
             p.OnUpdate = (current, needed, dwu) =>
             {
                 float curr = 0f;

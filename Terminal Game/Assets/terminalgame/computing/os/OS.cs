@@ -69,7 +69,7 @@ namespace terminalgame.computing.os
         public void Tick(float dt)
         {
             /* Update the processes */
-            _taskManager.OnTick(dt);
+            _taskManager.OnTick(dt, _hardware);
         }
 
         /// <summary>
