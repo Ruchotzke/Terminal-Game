@@ -23,6 +23,11 @@ namespace terminalgame.computing.os.display
         private char[,] _backBuffer;
 
         private OS _os;
+
+        /// <summary>
+        /// The last spawned process from this driver. Used to ensure dependency/ordering between rendering tasks.
+        /// </summary>
+        public Process LastSpawnedProcess;
         
         public DisplayDriver(OS parentOS)
         {
@@ -45,7 +50,7 @@ namespace terminalgame.computing.os.display
         /// <param name="cls">The character to clear the screen with.</param>
         public void ClearScreen(char cls = ' ')
         {
-            Process p = new Process(Size.rows * Size.cols / 100.0f, WorkloadCharacterization.TextRendering());
+            Process p = new Process(Size.rows * Size.cols / 100.0f, WorkloadCharacterization.TextRendering(), "cls");
             p.OnUpdate = (current, needed, dwu) =>
             {
                 float i = 0.0f;
@@ -57,7 +62,9 @@ namespace terminalgame.computing.os.display
                     }
                 }
             };
-
+            p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
+            if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+            LastSpawnedProcess = p;
             _os.EnqueueTask(p);
         }
 
@@ -71,7 +78,7 @@ namespace terminalgame.computing.os.display
         {
             if (!clearBot)
             {
-                Process p = new Process((Size.rows - rows) * Size.cols * 0.0001f, WorkloadCharacterization.TextRendering());
+                Process p = new Process((Size.rows - rows) * Size.cols * 0.0001f, WorkloadCharacterization.TextRendering(), "slideUpNoFill");
                 p.OnStart = () =>
                 {
                     _backBuffer = new char[Size.rows, Size.cols];
@@ -96,12 +103,14 @@ namespace terminalgame.computing.os.display
                         }
                     }
                 };
-
+                p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
+                if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+                LastSpawnedProcess = p;
                 _os.EnqueueTask(p);
             }
             else
             {
-                Process p = new Process(Size.rows * Size.cols * 0.0001f, WorkloadCharacterization.TextRendering());
+                Process p = new Process(Size.rows * Size.cols * 0.0001f, WorkloadCharacterization.TextRendering(), "slideUpWithFill");
                 p.OnStart = () =>
                 {
                     _backBuffer = new char[Size.rows, Size.cols];
@@ -135,7 +144,9 @@ namespace terminalgame.computing.os.display
                         }
                     }
                 };
-
+                p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
+                if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+                LastSpawnedProcess = p;
                 _os.EnqueueTask(p);
             }
         }
@@ -148,11 +159,14 @@ namespace terminalgame.computing.os.display
         /// <param name="ch"></param>
         public void SetChar(int row, int col, char ch)
         {
-            Process p = new Process(.01f, WorkloadCharacterization.TextRendering());
-            p.OnConclude = () =>
+            Process p = new Process(.01f, WorkloadCharacterization.TextRendering(), "setChar");
+            p.OnConclude.Add(() =>
             {
                 Screen[row, col] = ch;
-            };
+            });
+            p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
+            if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+            LastSpawnedProcess = p;
             _os.EnqueueTask(p);
         }
 
@@ -165,7 +179,7 @@ namespace terminalgame.computing.os.display
         /// <param name="str">The string to place. Will be clipped if off screen.</param>
         public void SetStr(int row, int col, string str)
         {
-            Process p = new Process(str.Length * 0.01f, WorkloadCharacterization.TextRendering());
+            Process p = new Process(str.Length * 0.01f, WorkloadCharacterization.TextRendering(), "setStr");
             p.OnUpdate = (current, needed, dwu) =>
             {
                 float curr = 0f;
@@ -174,7 +188,9 @@ namespace terminalgame.computing.os.display
                     Screen[row, c] = str[i];
                 }
             };
-
+            p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
+            if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+            LastSpawnedProcess = p;
             _os.EnqueueTask(p);
         }
 
@@ -221,6 +237,19 @@ namespace terminalgame.computing.os.display
             }
 
             return ret;
+        }
+
+        /// <summary>
+        /// Callback used to update the dependency chain. In the event a process is completed,
+        /// it needs to ensure the driver knows and can spawn new free processes.
+        /// </summary>
+        /// <param name="p"></param>
+        public void UpdateCompletedProcess(Process p)
+        {
+            if (LastSpawnedProcess == p)
+            {
+                LastSpawnedProcess = null;
+            }
         }
     }
 }

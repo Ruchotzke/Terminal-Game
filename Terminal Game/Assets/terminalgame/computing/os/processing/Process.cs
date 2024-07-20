@@ -13,6 +13,11 @@ namespace terminalgame.computing.os.processing
         public uint PID;
 
         /// <summary>
+        /// A human-readable name for this process.
+        /// </summary>
+        public string Name;
+
+        /// <summary>
         /// How much work is needed to complete this task.
         /// </summary>
         public float TotalWork;
@@ -23,15 +28,22 @@ namespace terminalgame.computing.os.processing
         public float CurrentWork;
 
         /// <summary>
+        /// A list of dependencies associated with this process.
+        /// </summary>
+        public List<Process> Dependencies;
+
+        /// <summary>
         /// The characterization of this process.
         /// </summary>
         public WorkloadCharacterization Characterization;
 
-        public Process(float totalWork, WorkloadCharacterization workloadCharacterization)
+        public Process(float totalWork, WorkloadCharacterization workloadCharacterization, string name)
         {
             TotalWork = totalWork;
             Characterization = workloadCharacterization;
+            Dependencies = new List<Process>();
             CurrentWork = 0;
+            Name = name;
         }
 
         /// <summary>
@@ -47,7 +59,10 @@ namespace terminalgame.computing.os.processing
 
             if (TotalWork <= CurrentWork)
             {
-                OnConclude();
+                foreach (var f in OnConclude)
+                {
+                    f();
+                }
                 return true;
             }
 
@@ -83,6 +98,6 @@ namespace terminalgame.computing.os.processing
         /// <summary>
         /// A callback for when the process has been completed.
         /// </summary>
-        public OnConcludeProcess OnConclude = () => { };
+        public List<OnConcludeProcess> OnConclude = new List<OnConcludeProcess>();
     }
 }
