@@ -141,7 +141,7 @@ namespace terminalgame.computing.os
         /// <returns>The new cursor column.</returns>
         private int PrintPrompt()
         {
-            string prompt = "[user]$ ";
+            string prompt = "$> ";
             return _primary.PrintLn(prompt) + 1; //to account for setstr() trimming
         }
     }

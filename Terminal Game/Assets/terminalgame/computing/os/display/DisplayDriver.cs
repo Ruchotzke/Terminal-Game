@@ -157,7 +157,8 @@ namespace terminalgame.computing.os.display
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <param name="ch"></param>
-        public void SetChar(int row, int col, char ch)
+        /// <returns>The end column of the char (post-string)</returns>
+        public int SetChar(int row, int col, char ch)
         {
             Process p = new Process(.01f, WorkloadCharacterization.TextRendering(), "setChar");
             p.OnConclude.Add(() =>
@@ -168,6 +169,8 @@ namespace terminalgame.computing.os.display
             if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
             LastSpawnedProcess = p;
             _os.EnqueueTask(p);
+            
+            return Mathf.Min(col + 1, Size.cols - 1);
         }
 
         /// <summary>
