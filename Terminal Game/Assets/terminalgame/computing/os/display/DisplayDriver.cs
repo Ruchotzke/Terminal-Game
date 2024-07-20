@@ -177,7 +177,8 @@ namespace terminalgame.computing.os.display
         /// <param name="row">The row to put the string in</param>
         /// <param name="col">The offset of the str.</param>
         /// <param name="str">The string to place. Will be clipped if off screen.</param>
-        public void SetStr(int row, int col, string str)
+        /// <returns>The end column of the string (post-string)</returns>
+        public int SetStr(int row, int col, string str)
         {
             Process p = new Process(str.Length * 0.01f, WorkloadCharacterization.TextRendering(), "setStr");
             p.OnUpdate = (current, needed, dwu) =>
@@ -192,19 +193,22 @@ namespace terminalgame.computing.os.display
             if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
             LastSpawnedProcess = p;
             _os.EnqueueTask(p);
+
+            return Mathf.Min(col + str.Length, Size.cols - 1);
         }
 
         /// <summary>
         /// Print a new line to the bottom of the terminal.
         /// </summary>
         /// <param name="str">The string to print. Does NOT need newline termination.</param>
-        public void PrintLn(string str)
+        /// <returns>The index of the column following the string.</returns>
+        public int PrintLn(string str)
         {
             str = str.TrimEnd();
 
             SlideUpwards();
             
-            SetStr(Size.rows - 1, 0, str);
+            return SetStr(Size.rows - 1, 0, str);
         }
 
         /// <summary>

@@ -18,6 +18,9 @@ namespace terminalgame.computing.os
         /// </summary>
         public uint InstallSize = 8000;
 
+        /// <summary>
+        /// The primary monitor being used.
+        /// </summary>
         private DisplayDriver _primary;
 
         /// <summary>
@@ -25,7 +28,44 @@ namespace terminalgame.computing.os
         /// </summary>
         private HwManager _hardware;
 
+        /// <summary>
+        /// The task scheduler for this OS.
+        /// </summary>
         private TaskManager _taskManager;
+        
+        #region OS_State
+
+        /// <summary>
+        /// The row the cursor is currently in.
+        /// </summary>
+        private int _cursorRow;
+        
+        /// <summary>
+        /// The column the cursor is currently in.
+        /// </summary>
+        private int _cursorCol;
+
+        /// <summary>
+        /// The character to print the cursor with.
+        /// </summary>
+        private char _cursorChar = '\u2588';
+
+        /// <summary>
+        /// Whether the cursor is being printed or not
+        /// </summary>
+        private bool _cursorOn = true;
+
+        /// <summary>
+        /// The time left until a cursor blink.
+        /// </summary>
+        private float _cursorTimer = 0.0f;
+
+        /// <summary>
+        /// How long the cursor should stay on/off.
+        /// </summary>
+        private float _cursorBlinkDelay = 0.75f;
+
+        #endregion
         
         /// <summary>
         /// Boot the operating system.
@@ -48,21 +88,20 @@ namespace terminalgame.computing.os
             }
             
             /* Print some test material to the display */
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            _primary.PrintLn("BOOT sequence initiated");
+            _primary.PrintLn("Cataloguing Hardware Resources...................................done.");
+            _primary.PrintLn("Loading Modules..................................................done.");
+            _primary.PrintLn("Initializing Task Scheduler......................................done.");
+            _primary.PrintLn("BOOT sequence completed in 0.19s");
             _primary.SlideUpwards();
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.SlideUpwards();
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.SetChar(5, 0, '!');
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.SetStr(_primary.Size.rows - 1, 5, "hello!");
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
-            _primary.PrintLn("00001 101 010 101 0100101 010 10 1010 1010 0101010 101 0101 010 010 01");
+            
+            /* Initialize the cursor */
+            _cursorRow = _primary.Size.rows - 1;
+            _cursorCol = 0;
+            
+            /* Print the prompt */
+            _cursorCol = PrintPrompt();
+            _primary.SetChar(_cursorRow, _cursorCol, '\u2588');
         }
         
         /// <summary>
@@ -73,6 +112,15 @@ namespace terminalgame.computing.os
         {
             /* Update the processes */
             _taskManager.OnTick(dt, _hardware);
+            
+            /* Update the cursor */
+            _cursorTimer -= dt;
+            if (_cursorTimer <= 0.0f)
+            {
+                _cursorTimer = _cursorBlinkDelay;
+                _cursorOn = !_cursorOn;
+                _primary.SetChar(_cursorRow, _cursorCol, _cursorOn ? _cursorChar : ' ');
+            }
         }
 
         /// <summary>
@@ -85,6 +133,16 @@ namespace terminalgame.computing.os
         {
             _taskManager.EnqueueTask(p);
             return true;
+        }
+
+        /// <summary>
+        /// Print the OS prompt to the user.
+        /// </summary>
+        /// <returns>The new cursor column.</returns>
+        private int PrintPrompt()
+        {
+            string prompt = "[user]$ ";
+            return _primary.PrintLn(prompt) + 1; //to account for setstr() trimming
         }
     }
 }
