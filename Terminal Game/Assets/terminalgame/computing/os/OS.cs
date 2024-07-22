@@ -142,7 +142,7 @@ namespace terminalgame.computing.os
             HandleInput();
             
             /* Print the current view */
-            if (_numCharsChanged > 0)
+            if (_numCharsChanged > 0 && _acceptingInput)
             {
                 PrintPromptAndInput();
                 _numCharsChanged = 0;
@@ -198,6 +198,10 @@ namespace terminalgame.computing.os
                 {
                     /* Newline/enter pressed */
                     _acceptingInput = false;
+                    _primary.SetChar(_cursorRow, _cursorCol + _promptString.Length, ' ');
+                    HandleCommand(_currentInput);
+                    _currentInput = "";
+                    _cursorCol = 0;
                 }
                 else if (next.Value == '\b')
                 {
@@ -240,14 +244,47 @@ namespace terminalgame.computing.os
         {
             if (!_cursorOn)
             {
-                _primary.SetStr(_cursorRow, 0, _promptString + _currentInput + " ");
+                _primary.SetStr(_cursorRow, 0, _promptString + _currentInput + " ", false);
             }
             else
             {
                 string newstr = _promptString + _currentInput.Substring(0, _cursorCol) + _cursorCharacter;
                 if (_cursorCol < _currentInput.Length - 1) newstr += _currentInput.Substring(_cursorCol + 1);
                 else newstr += " ";
-                _primary.SetStr(_cursorRow, 0, newstr);
+                _primary.SetStr(_cursorRow, 0, newstr, false);
+            }
+        }
+
+        /// <summary>
+        /// Handle the command offered to the OS.
+        /// </summary>
+        /// <param name="command">the command to process</param>
+        private void HandleCommand(string command)
+        {
+            /* First split the command into argv */
+            string[] split = command.Split();
+            
+            /* Match based on the first element (the command) */
+            switch (split[0])
+            {
+                case "echo":
+                    /* Echo: print out whatever else was supplied */
+                    string merge = "";
+                    if (split.Length > 1)
+                    {
+                        for (int i = 1; i < split.Length; i++)
+                        {
+                            merge += split[i] + " ";
+                        }
+                    }
+
+                    _primary.PrintLn(merge);
+                    _primary.PrintLn("", () => _acceptingInput = true);
+                    break;
+                default:
+                    _primary.PrintLn(split[0] + " is not a recognized command.");
+                    _primary.PrintLn("", () => _acceptingInput = true);
+                    break;
             }
         }
     }

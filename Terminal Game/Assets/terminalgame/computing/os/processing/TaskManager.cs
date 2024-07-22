@@ -77,6 +77,9 @@ namespace terminalgame.computing.os.processing
                     if (!completed)
                     {
                         tasksLeft--;    //completed tasks won't count towards total, since they were so small.
+                    }
+                    else
+                    {
                         didCompleteTask = true;
                     }
                     

@@ -181,7 +181,7 @@ namespace terminalgame.computing.os.display
         /// <param name="col">The offset of the str.</param>
         /// <param name="str">The string to place. Will be clipped if off screen.</param>
         /// <returns>The end column of the string (post-string)</returns>
-        public int SetStr(int row, int col, string str, bool useCost = true)
+        public int SetStr(int row, int col, string str, bool useCost = true, Process.OnConcludeProcess finishCallback = null)
         {
             if (useCost)
             {
@@ -196,6 +196,7 @@ namespace terminalgame.computing.os.display
                 };
                 p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
                 if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+                if (finishCallback != null) p.OnConclude.Add(finishCallback);
                 LastSpawnedProcess = p;
                 _os.EnqueueTask(p);
 
@@ -213,6 +214,7 @@ namespace terminalgame.computing.os.display
                     }
                 });
                 if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+                if (finishCallback != null) p.OnConclude.Add(finishCallback);
                 LastSpawnedProcess = p;
                 _os.EnqueueTask(p);
 
@@ -225,13 +227,13 @@ namespace terminalgame.computing.os.display
         /// </summary>
         /// <param name="str">The string to print. Does NOT need newline termination.</param>
         /// <returns>The index of the column following the string.</returns>
-        public int PrintLn(string str)
+        public int PrintLn(string str, Process.OnConcludeProcess conclusionCallback = null)
         {
             str = str.TrimEnd();
 
             SlideUpwards();
             
-            return SetStr(Size.rows - 1, 0, str);
+            return SetStr(Size.rows - 1, 0, str, true, conclusionCallback);
         }
 
         /// <summary>
