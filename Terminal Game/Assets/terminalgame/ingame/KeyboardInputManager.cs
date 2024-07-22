@@ -49,7 +49,7 @@ namespace terminalgame.ingame
 
                 o.HorizontalDirection = a.HorizontalDirection + b.HorizontalDirection;
                 o.VerticalDirection = a.VerticalDirection = b.VerticalDirection;
-
+                
                 return o;
             }
         }

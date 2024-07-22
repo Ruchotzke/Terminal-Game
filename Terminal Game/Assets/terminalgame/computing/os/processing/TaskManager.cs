@@ -59,6 +59,7 @@ namespace terminalgame.computing.os.processing
             int tasksLeft = 3;
             int MAX_PRIORITY = 5;
             bool areStalledTasks = false;
+            bool didCompleteTask = false;
 
             for (int priority = 0; priority < MAX_PRIORITY && tasksLeft > 0; priority++)
             {
@@ -73,12 +74,17 @@ namespace terminalgame.computing.os.processing
                 foreach (var proc in taskResult.processes)
                 {
                     bool completed = ProcessTask(proc, resources, dt);
-                    tasksLeft--;
+                    if (!completed)
+                    {
+                        tasksLeft--;    //completed tasks won't count towards total, since they were so small.
+                        didCompleteTask = true;
+                    }
+                    
                 }
             }
             
             /* If MAX_TASKS == tasksLeft and there are stalled tasks, something is very wrong (those tasks can never complete) */
-            if (MAX_TASKS == tasksLeft && areStalledTasks)
+            if (MAX_TASKS == tasksLeft && areStalledTasks && !didCompleteTask)
             {
                 Debug.LogError("Stalled tasks while there are no remaining ready tasks. System is stalled.");
             }

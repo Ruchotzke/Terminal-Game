@@ -181,23 +181,43 @@ namespace terminalgame.computing.os.display
         /// <param name="col">The offset of the str.</param>
         /// <param name="str">The string to place. Will be clipped if off screen.</param>
         /// <returns>The end column of the string (post-string)</returns>
-        public int SetStr(int row, int col, string str)
+        public int SetStr(int row, int col, string str, bool useCost = true)
         {
-            Process p = new Process(str.Length * 0.01f, WorkloadCharacterization.TextRendering(), "setStr");
-            p.OnUpdate = (current, needed, dwu) =>
+            if (useCost)
             {
-                float curr = 0f;
-                for (int c = col, i = 0; c < Size.cols && i < str.Length && curr < current; c++, i++, curr += 0.01f)
+                Process p = new Process(str.Length * 0.01f, WorkloadCharacterization.TextRendering(), "setStr");
+                p.OnUpdate = (current, needed, dwu) =>
                 {
-                    Screen[row, c] = str[i];
-                }
-            };
-            p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
-            if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
-            LastSpawnedProcess = p;
-            _os.EnqueueTask(p);
+                    float curr = 0f;
+                    for (int c = col, i = 0; c < Size.cols && i < str.Length && curr < current; c++, i++, curr += 0.01f)
+                    {
+                        Screen[row, c] = str[i];
+                    }
+                };
+                p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
+                if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+                LastSpawnedProcess = p;
+                _os.EnqueueTask(p);
 
-            return Mathf.Min(col + str.Length, Size.cols - 1);
+                return Mathf.Min(col + str.Length, Size.cols - 1);
+            }
+            else
+            {
+                Process p = new Process(0, WorkloadCharacterization.TextRendering(), "setStrFree");
+                p.OnConclude.Add(delegate { UpdateCompletedProcess(p); });
+                p.OnConclude.Add(delegate
+                {
+                    for (int c = col, i = 0; c < Size.cols && i < str.Length; c++, i++)
+                    {
+                        Screen[row, c] = str[i];
+                    }
+                });
+                if (LastSpawnedProcess != null) p.Dependencies.Add(LastSpawnedProcess);
+                LastSpawnedProcess = p;
+                _os.EnqueueTask(p);
+
+                return Mathf.Min(col + str.Length, Size.cols - 1);
+            }
         }
 
         /// <summary>

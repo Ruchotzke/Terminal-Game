@@ -37,6 +37,11 @@ namespace terminalgame.computing.os
         /// Input management for this OS.
         /// </summary>
         private InputManager _inputManager;
+
+        /// <summary>
+        /// The string used for prompting the user.
+        /// </summary>
+        private string _promptString = "$> ";
         
         #region OS_State
 
@@ -71,15 +76,20 @@ namespace terminalgame.computing.os
         private float _cursorBlinkDelay = 0.75f;
 
         /// <summary>
-        /// The character underneath the cursor.
-        /// </summary>
-        private char _cursorReplacementChar = ' ';
-
-        /// <summary>
         /// Whether or not the OS is accepting input.
         /// </summary>
         private bool _acceptingInput = true;
 
+        /// <summary>
+        /// The current input string to the OS (anything following the prompt)
+        /// </summary>
+        private string _currentInput = "";
+
+        /// <summary>
+        /// How many chars were changed in the last tick (used to make screen updates reasonable/efficient).
+        /// </summary>
+        private int _numCharsChanged = 0;
+        
         #endregion
         
         /// <summary>
@@ -116,8 +126,7 @@ namespace terminalgame.computing.os
             _cursorCol = 0;
             
             /* Print the prompt */
-            _cursorCol = PrintPrompt();
-            _primary.SetChar(_cursorRow, _cursorCol, '\u2588');
+            PrintPromptAndInput();
         }
         
         /// <summary>
@@ -132,13 +141,20 @@ namespace terminalgame.computing.os
             /* Handle any input */
             HandleInput();
             
+            /* Print the current view */
+            if (_numCharsChanged > 0)
+            {
+                PrintPromptAndInput();
+                _numCharsChanged = 0;
+            }
+            
             /* Update the cursor */
             _cursorTimer -= dt;
             if (_cursorTimer <= 0.0f)
             {
                 _cursorTimer = _cursorBlinkDelay;
                 _cursorOn = !_cursorOn;
-                _primary.SetChar(_cursorRow, _cursorCol, _cursorOn ? _cursorCharacter : _cursorReplacementChar);
+                _numCharsChanged += 1;
             }
         }
 
@@ -155,16 +171,6 @@ namespace terminalgame.computing.os
         }
 
         /// <summary>
-        /// Print the OS prompt to the user.
-        /// </summary>
-        /// <returns>The new cursor column.</returns>
-        private int PrintPrompt()
-        {
-            string prompt = "$> ";
-            return _primary.PrintLn(prompt) + 1; //to account for setstr() trimming
-        }
-
-        /// <summary>
         /// Process any input in the input stream.
         /// </summary>
         private void HandleInput()
@@ -175,11 +181,9 @@ namespace terminalgame.computing.os
             int horizMove = _inputManager.HorizontalCursorPoll();
             if (horizMove != 0)
             {
-                /* Remove the old cursor */
-                _primary.SetChar(_cursorRow, _cursorCol, _cursorReplacementChar);
-                
                 /* Move the cursor */
-                _cursorCol = Mathf.Clamp(_cursorCol + horizMove, 0, _primary.Size.cols - 1);
+                _cursorCol = Mathf.Clamp(_cursorCol + horizMove, 0, _currentInput.Length);
+                _numCharsChanged += 2;
                 cursorHasMoved = true;
             }
             
@@ -190,7 +194,7 @@ namespace terminalgame.computing.os
 
                 if (next == null) break;
 
-                if (next.Value == '\n' || next.Value == '\r')
+                if (next.Value is '\n' or '\r')
                 {
                     /* Newline/enter pressed */
                     _acceptingInput = false;
@@ -199,8 +203,9 @@ namespace terminalgame.computing.os
                 {
                     /* Backspace */
                     if (_cursorCol == 0) continue;
-                    _primary.SetChar(_cursorRow, _cursorCol, ' ');
+                    _currentInput = _currentInput.Remove(_cursorCol - 1, 1);
                     _cursorCol -= 1;
+                    _numCharsChanged += 1;
                     cursorHasMoved = true;
                 }
                 else
@@ -213,8 +218,9 @@ namespace terminalgame.computing.os
                         continue;
                     }
 
-                    _primary.SetChar(_cursorRow, _cursorCol, next.Value);
+                    _currentInput = _currentInput.Insert(_cursorCol, "" + next.Value);
                     _cursorCol += 1;
+                    _numCharsChanged += 1;
                     cursorHasMoved = true;
                 }
             }
@@ -222,9 +228,26 @@ namespace terminalgame.computing.os
             /* Reset the cursor so its visible */
             if (cursorHasMoved)
             {
-                _primary.SetChar(_cursorRow, _cursorCol, _cursorCharacter);
                 _cursorTimer = _cursorBlinkDelay;
                 _cursorOn = true;
+            }
+        }
+
+        /// <summary>
+        /// Print the OS prompt along with the input/cursor currently used.
+        /// </summary>
+        private void PrintPromptAndInput()
+        {
+            if (!_cursorOn)
+            {
+                _primary.SetStr(_cursorRow, 0, _promptString + _currentInput + " ");
+            }
+            else
+            {
+                string newstr = _promptString + _currentInput.Substring(0, _cursorCol) + _cursorCharacter;
+                if (_cursorCol < _currentInput.Length - 1) newstr += _currentInput.Substring(_cursorCol + 1);
+                else newstr += " ";
+                _primary.SetStr(_cursorRow, 0, newstr);
             }
         }
     }
